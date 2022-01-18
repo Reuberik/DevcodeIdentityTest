@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "40ece898-12ce-48c9-a609-c5dbea6d2a1a": {
+      "ProjectGuid": "40ece898-12ce-48c9-a609-c5dbea6d2a1a",
+      "DisplayName": "dotnet_core_mvc",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}

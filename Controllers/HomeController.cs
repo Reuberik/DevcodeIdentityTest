@@ -22,10 +22,9 @@ namespace dotnet_core_mvc.Controllers {
         private string key = "Q2ONoncZ5S57UVWeu04zuW5WZh"; // TODO: generate your own random string
         //private string clientId = "74698bec9c364deebd4ce3bb1a17f916"; // TODO: use your clientId
         //private string clientSecret = "750dfa4b45d449a5a082606f59d203b5"; // TODO: use your API-key
-        public ISecureDataFormat<AuthenticationProperties> StateDataFormat;
-        //private string key = "Q2ONoncZ5S57UVWeu04zuW5WZh"; // TODO: generate your own random string
         private string clientId = "d44646bcbd2e4b95a88ee5d598668b2e"; // TODO: use your clientId
         private string clientSecret = "0a5642b0fcd34b5ba9640e06db7e21fd"; // TODO: use your API-key
+        public ISecureDataFormat<AuthenticationProperties> StateDataFormat;
         public IActionResult Index() {
             // this is just to make sure a session cookie is created in the example app
             HttpContext.Session.Set("dummy", Encoding.ASCII.GetBytes("dummy-value"));
@@ -50,6 +49,8 @@ namespace dotnet_core_mvc.Controllers {
         [HttpGet("/home/callback")]
         public async Task<IActionResult> CallbackAsync(string code, string state) {
             var sessionId = HttpContext.Session.Id;
+
+            #region NotUsed
             // get salt from state
             //var stateParts = state.Split('.');
             //if (stateParts.Length != 2)
@@ -79,14 +80,14 @@ namespace dotnet_core_mvc.Controllers {
             //        });
             //    }
             //}
+            #endregion
 
             var client = new HttpClient();
             client.SetBasicAuthenticationOAuth(clientId, clientSecret);
             var response = await client.RequestAuthorizationCodeTokenAsync(new AuthorizationCodeTokenRequest {
                 Address = hostURL + "/paymentiq/oauth/token",
                 Code = code,
-                //RedirectUri = string.Format("{0}://{1}{2}", Request.Scheme, Request.Host, "/callback"),
-                RedirectUri = "https://2955-89-233-222-171.ngrok.io/home/callback",
+                RedirectUri = "https://2955-89-233-222-171.ngrok.io/home/callback", // https://ngrok.com/ for testing locally
             });
 
             // handle error
@@ -106,6 +107,7 @@ namespace dotnet_core_mvc.Controllers {
             }
             return Error();
 
+            #region NotUsed
             //var claims = identityToken.Claims;
             //// extract claims
             //var loggedInModel = new LoggedInModel() {
@@ -156,9 +158,15 @@ namespace dotnet_core_mvc.Controllers {
 
             // show User-view if everything is OK
             // TODO: you probably want to show something else (e.g. welcome screen)
-            
+            #endregion
         }
 
+        /// <summary>
+        /// Use https://ngrok.com/ to open up a local port
+        /// Install ngrok in C:/ use node.js cmd and call
+        /// ngrok.exe http https://localhost:{Port} -host-header=localhost:{port}
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Auth() {
             // redirect user to login
@@ -172,7 +180,6 @@ namespace dotnet_core_mvc.Controllers {
 
             var appURL = string.Format("{0}://{1}", Request.Scheme, Request.Host);
 
-            //"https://test-api.paymentiq.io/paymentiq/oauth/authorize?client_id=d44646bcbd2e4b95a88ee5d598668b2e&redirect_uri=http://localhost:53163/signin-paymentiq?stateKey=ip0M1dFCvpbtm-70Erxd6y-fuRA0Ms4ThEiJ_bDtJF4f0jCvoypXVWNBzYcoYIc1fObor2876ZMB3WQgtjihcSySlWCHQ5tvW3-CdmOu6xJpbpk3mqme5is8wj3zg7ZToMRSbqoDsCQJR3APXrjtcYe93WUFWFW1aNu-sZzOiw2ihQJ1asI6TYqW36y_DDN8WBF4mGkD7M8GSn7crQ_y-7j8f6sZuEbzN4BbSXmCQFdjO9y-p5oB5CqmgbXgufXX2oPbVFnEmsXHaI9sdJpGz_CCd_47g68-GSWUFTIkl-GFHCrBmN1zdD94Wr6AIJFlzIlvGh0FZvJk_QT3e4gwI9EQFsuzUEIRxhA8g99B_WoS1ISQcTgJ-jettogBpkk3C8nbuCQwBVeqSE7Ft1Z9yq18tzkEzDMldLCYoCu1LaOXLG7QUVokY1KXuIw3HpmnUJfi_Q&identity_provider=gii-bankid-se&ssn=198407070294&display=popup&ui_friendly=bokase-1&provider_attributes[bankid-se-device]=other&provider_attributes[bankid-se-qr]=false&provider_attributes[ui_locales]=sv&provider_attributes[platform]="
             // construct total URL
             var url = string.Format("{0}/paymentiq/oauth/authorize?client_id={1}" +
                 "&redirect_uri={2}" +
@@ -187,27 +194,11 @@ namespace dotnet_core_mvc.Controllers {
             hostURL,
             clientId,
             Uri.EscapeDataString("https://2955-89-233-222-171.ngrok.io/home/callback?stateKey=" + state),
-            "198407070294");
+            "198407070294"); // 
             return Redirect(url);
-
-
-
-            //  + "/signin-paymentiq
-
-            //var queryStrings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
-            //    {"client_id", clientId},
-            //    {"redirect_uri", redirectUri}, // Redirect handled inside InvokeReplyPathAsync()
-            //    {"identity_provider", Options.IdentityProvider.Name},
-            //    {"ssn", pin},
-            //    {"display", "popup"}, // page customized for iframe
-            //    {"ui_friendly", "bokase-1"}, // Boka theme
-            //    {"provider_attributes[bankid-se-device]", string.IsNullOrEmpty(pin) ? "same" : "other"},
-            //    {"provider_attributes[bankid-se-qr]", "false"},
-            //    {"provider_attributes[ui_locales]", Request.Query["locale"]},
-            //    {"provider_attributes[platform]", string.IsNullOrWhiteSpace(pin) && !string.IsNullOrWhiteSpace(isMobile) && bool.Parse(isMobile) ? "native" : ""} // open BankID app automatically on same device
-            //};
         }
 
+        #region NotUsed
         [HttpGet("Home/Sign")]
         public async Task<IActionResult> SignAsync() {
             // create sign-post
@@ -259,6 +250,7 @@ namespace dotnet_core_mvc.Controllers {
             signPost.id);
             return Redirect(url);
         }
+        #endregion
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error() {
